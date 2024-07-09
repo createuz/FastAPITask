@@ -1,7 +1,6 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 import uvicorn
 from transformers import LlamaForCausalLM, AutoTokenizer
-import torch
 
 # Загрузка модели и токенизатора
 model_name = "meta-llama/Meta-Llama-3-8B-Instruct"
@@ -19,5 +18,17 @@ async def generate(prompt: str):
     return {"response": response}
 
 
-if __name__ == '__main__':
-    uvicorn.run(app, host='0.0.0.0', port=5000)
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=5000)
+
+"""
+server{
+       listen 80;
+       server_name 92.118.57.15; 
+       location / {
+           proxy_pass http://127.0.0.1:8081;
+       }
+}
+
+
+"""
