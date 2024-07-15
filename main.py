@@ -65,5 +65,5 @@ async def generate(prompt: str):
 
 if __name__ == '__main__':
     import uvicorn
+    uvicorn.run(app, host='0.0.0.0', port=40714)
 
-    uvicorn.run(app, host='0.0.0.0', port=5000)
