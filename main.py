@@ -7,6 +7,7 @@ model_name = "meta-llama/Meta-Llama-3-8B-Instruct"
 model = LlamaForCausalLM.from_pretrained(model_name, use_auth_token='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')
 tokenizer = AutoTokenizer.from_pretrained(model_name, use_auth_token='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')
 
+# Add pad_token to tokenizer
 tokenizer.add_special_tokens({'pad_token': '[PAD]'})
 
 device = torch.device("cpu")
@@ -22,10 +23,11 @@ class Prompt(BaseModel):
 
 @app.get("/generate")
 async def generate_get(prompt: str):
-    inputs = tokenizer.encode_plus(prompt, return_tensors='pt', padding=True)
+    inputs = tokenizer.encode_plus(prompt, return_tensors='pt', padding=True, pad_to_max_length=True)
     input_ids = inputs["input_ids"].to(device)
     attention_mask = inputs["attention_mask"].to(device)
-    outputs = model.generate(input_ids, attention_mask=attention_mask, max_length=100, num_return_sequences=1)
+    outputs = model.generate(input_ids, attention_mask=attention_mask, max_length=100, num_return_sequences=1,
+                             pad_token_id=tokenizer.pad_token_id)
     response = tokenizer.decode(outputs[0], skip_special_tokens=True)
 
     return {"response": response}
