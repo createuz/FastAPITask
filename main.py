@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Request
 from transformers import LlamaForCausalLM, AutoTokenizer
+from pydantic import BaseModel
 import torch
 
 model_name = "meta-llama/Meta-Llama-3-8B-Instruct"
@@ -12,6 +13,10 @@ model.to(device)
 app = FastAPI()
 
 
+class Prompt(BaseModel):
+    prompt: str
+
+
 @app.get("/generate")
 async def generate(prompt: str):
     inputs = tokenizer.encode(prompt, return_tensors='pt').to(device)
@@ -19,3 +24,13 @@ async def generate(prompt: str):
     response = tokenizer.decode(outputs[0], skip_special_tokens=True)
     return {"response": response}
 
+
+# @app.post("/generate")
+# async def generate(prompt: Prompt):
+#     inputs = tokenizer.encode_plus(prompt.prompt, return_tensors='pt', padding=True)
+#     input_ids = inputs["input_ids"].to(device)
+#     attention_mask = inputs["attention_mask"].to(device)
+#     outputs = model.generate(input_ids, attention_mask=attention_mask, max_length=100, num_return_sequences=1)
+#     response = tokenizer.decode(outputs[0], skip_special_tokens=True)
+#
+#     return {"response": response}
